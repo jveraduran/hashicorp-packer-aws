@@ -37,14 +37,17 @@ jobs:
         uses: hashicorp/packer-github-actions@master
         with:
           command: init
-
-      - name: Build Artifact
-        uses: hashicorp/packer-github-actions@master
-        with:
-          command: build
-          arguments: "-color=false -on-error=abort"
-        env:
-          AWS_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY }}
-          AWS_SECRET_KEY: ${{ secrets.AWS_SECRET_KEY }}
-          CONSUL_HTTP_ADDR: ${{ secrets.CONSUL_HTTP_ADDR }}
-          CONSUL_HTTP_TOKEN: ${{ secrets.CONSUL_HTTP_TOKEN }}
+      
+      - name: Download Packer Plugin
+        shell: ls -ltr
+        
+      # - name: Build Artifact
+      #   uses: hashicorp/packer-github-actions@master
+      #   with:
+      #     command: build
+      #     arguments: "-color=false -on-error=abort"
+      #   env:
+      #     AWS_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY }}
+      #     AWS_SECRET_KEY: ${{ secrets.AWS_SECRET_KEY }}
+      #     CONSUL_HTTP_ADDR: ${{ secrets.CONSUL_HTTP_ADDR }}
+      #     CONSUL_HTTP_TOKEN: ${{ secrets.CONSUL_HTTP_TOKEN }}
