@@ -1,0 +1,49 @@
+name: Packer
+
+on:
+  push:
+    branches: [develop, staging, master]
+  pull_request: 
+    branches: [develop, staging, master]
+    types: [opened, synchronize]
+  workflow_call:
+
+jobs:
+  Validate:
+    if: github.event_name != 'opened'
+    runs-on: ubuntu-latest
+    name: Validate
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Validate Template
+        uses: hashicorp/packer-github-actions@master
+        with:
+          command: validate
+          arguments: -syntax-only
+          target: packer.json.pkr.hcl
+
+  Init:
+    needs: [Validate]
+    if: ${{ (github.event_name == 'push') && always() }}
+    runs-on: ubuntu-latest
+    name: Init
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+      
+      - name: Download Packer Plugin
+        uses: hashicorp/packer-github-actions@master
+        with:
+          command: init
+          arguments: config.pkr.hcl
+
+      - name: Build Artifact
+        uses: hashicorp/packer-github-actions@master
+        with:
+          command: build
+          arguments: "-color=false -on-error=abort"
+        env:
+          AWS_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY }}
+          AWS_SECRET_KEY: ${{ secrets.AWS_SECRET_KEY }}

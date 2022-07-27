@@ -1,0 +1,16 @@
+name: Github Actions Linter
+on:
+  pull_request: 
+    branches: [develop, staging, master]
+    types: [opened, synchronize]
+
+jobs:
+  Linter:
+    if: github.event_name != 'opened'
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install Linter
+        run: brew install actionlint
+      - name: Execute Linter
+        run: actionlint
