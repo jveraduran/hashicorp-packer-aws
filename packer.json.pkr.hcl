@@ -80,10 +80,10 @@ build {
 
 # details about provisioner in the documentation
 # https://www.packer.io/plugins/provisioners/ansible/ansible
-  provisioner "ansible" {
-    playbook_file = "./ansible/k8s.yaml"
-    user          = "ubuntu"
-  }
+#  provisioner "ansible" {
+#    playbook_file = "./ansible/k8s.yaml"
+#    user          = "ubuntu"
+#  }
 
 # details about provisioner in the documentation
 # https://www.packer.io/docs/provisioners/file
