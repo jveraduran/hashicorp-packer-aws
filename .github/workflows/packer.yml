@@ -37,15 +37,12 @@ jobs:
         uses: hashicorp/packer-github-actions@master
         with:
           command: init
-      
-      - name: List
-        run: "ls -ltr" 
 
       - name: Build Artifact
         uses: hashicorp/packer-github-actions@master
         with:
           command: build
-          arguments: "-color=false -on-error=abort"
+          arguments: "-color=false -on-error=abort -force"
         env:
           AWS_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY }}
           AWS_SECRET_KEY: ${{ secrets.AWS_SECRET_KEY }}
