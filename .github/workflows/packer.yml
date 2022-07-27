@@ -10,7 +10,7 @@ on:
 
 jobs:
   Validate:
-    if: github.event_name != 'opened'
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     name: Validate
     steps:
