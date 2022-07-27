@@ -26,7 +26,7 @@ jobs:
 
   Init:
     needs: [Validate]
-    if: ${{ (github.event_name == 'push') && always() }}
+    if: ${{ (github.event_name == 'push') && success() }}
     runs-on: ubuntu-latest
     name: Init
     steps:
@@ -46,3 +46,5 @@ jobs:
         env:
           AWS_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY }}
           AWS_SECRET_KEY: ${{ secrets.AWS_SECRET_KEY }}
+          CONSUL_HTTP_ADDR: ${{ secrets.CONSUL_HTTP_ADDR }}
+          CONSUL_HTTP_TOKEN: ${{ secrets.CONSUL_HTTP_TOKEN }}
