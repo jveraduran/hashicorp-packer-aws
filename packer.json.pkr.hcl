@@ -81,14 +81,14 @@ build {
 # details about provisioner in the documentation
 # https://www.packer.io/plugins/provisioners/ansible/ansible
   provisioner "ansible" {
-    playbook_file = "../ansible/k8s.yaml"
+    playbook_file = "/home/runner/work/_temp/_github_workflow/ansible/k8s.yaml"
     user          = "ubuntu"
   }
 
 # details about provisioner in the documentation
 # https://www.packer.io/docs/provisioners/file
   provisioner "file" {
-    source      = "../ssh/ssh_config"
+    source      = "/home/runner/work/_temp/_github_workflow/ssh/ssh_config"
     destination = "~/ssh-conf/ssh_config"
   }
 }
