@@ -38,9 +38,9 @@ jobs:
         with:
           command: init
       
-      - name: Download Packer Plugin
-        shell: ls -ltr
-        
+      - name: List
+        run: "ls -ltr"
+
       # - name: Build Artifact
       #   uses: hashicorp/packer-github-actions@master
       #   with:
