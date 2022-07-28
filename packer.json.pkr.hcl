@@ -46,7 +46,7 @@ variable "consul_http_token" {
 }
 # https://www.packer.io/docs/templates/hcl_templates/functions/contextual/consul
 locals {
-  ssh_username  = "${consul_key(join("/",var.app_env,"packer/ssh-username"))}"
+  ssh_username  = "${consul_key(join("/",[var.app_env,"packer/ssh-username"]))}"
   ami_name      = "${consul_key("polymathes/temporal/packer/ami-name")}"
   source_ami    = "${consul_key("polymathes/temporal/packer/source-ami")}"
   instance_type = "${consul_key("polymathes/temporal/packer/instance-type")}"
