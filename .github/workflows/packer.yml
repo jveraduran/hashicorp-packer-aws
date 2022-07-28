@@ -33,6 +33,25 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v2
       
+      - name: Setup ENV
+        shell: bash
+        run: |-
+          if [ ${{ github.event_name }} == "pull_request" ]; then 
+            branch=$(echo ${{ github.base_ref }}  | tr / -)
+          else 
+            branch=$(echo ${GITHUB_REF#refs/heads/} | tr / -)
+          fi
+          if [ $branch = "master" ]; then 
+            env="production";
+          elif [ $branch = "develop" ]; then 
+            env="develop";
+          elif [ $branch = "staging" ]; then 
+            env="staging";
+          else 
+            echo "invalid environment"; exit -1
+          fi
+          echo "ENV=$(echo $env)" >> $GITHUB_ENV
+      
       - name: Download Packer Plugin
         uses: hashicorp/packer-github-actions@master
         with:
@@ -49,3 +68,4 @@ jobs:
           AWS_REGION: "us-east-1"
           CONSUL_HTTP_ADDR: ${{ secrets.CONSUL_HTTP_ADDR }}
           CONSUL_HTTP_TOKEN: ${{ secrets.CONSUL_HTTP_TOKEN }}
+          APP_ENV: ${{ env.ENV }}

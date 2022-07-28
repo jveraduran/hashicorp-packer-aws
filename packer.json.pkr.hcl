@@ -32,7 +32,7 @@ variable "region" {
 
 variable "app_env" {
   type    = string
-  default = "polymathes/temporal"
+  default = "${env("APP_ENV")}"
 }
 
 variable "consul_http_addr" {
@@ -46,8 +46,8 @@ variable "consul_http_token" {
 }
 # https://www.packer.io/docs/templates/hcl_templates/functions/contextual/consul
 locals {
-  ssh_username  = "${consul_key(join("/",[var.app_env,"packer/ssh-username"]))}"
-  ami_name      = "${consul_key("polymathes/temporal/packer/ami-name")}"
+  ami_name      = "${consul_key(join("/",["polymathes/temporal",var.app_env,"packer/ami-name"]))}"
+  ssh_username  = "${consul_key("polymathes/temporal/packer/ssh-username")}"
   source_ami    = "${consul_key("polymathes/temporal/packer/source-ami")}"
   instance_type = "${consul_key("polymathes/temporal/packer/instance-type")}"
 }
