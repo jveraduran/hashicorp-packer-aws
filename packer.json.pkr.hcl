@@ -67,7 +67,8 @@ source "amazon-ebs" "ami" {
   source_ami            = "${local.source_ami}"
   ssh_username          = "${local.ssh_username}"
   tags = {
-    Name     = "${local.ami_name}"
+    Name        = "${local.ami_name}"
+    Environment = "${var.app_env}"
   }
 }
 
