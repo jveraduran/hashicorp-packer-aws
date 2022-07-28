@@ -35,6 +35,11 @@ variable "app_env" {
   default = "${env("APP_ENV")}"
 }
 
+variable "version" {
+  type    = string
+  default = "${env("VERSION")}"
+}
+
 variable "consul_http_addr" {
   type    = string
   default = "${env("CONSUL_HTTP_ADDR")}"
@@ -59,7 +64,7 @@ locals {
 # https://www.packer.io/plugins/builders/amazon/ebs
 source "amazon-ebs" "ami" {
   access_key            = "${var.aws_access_key}"
-  ami_name              = "${local.ami_name}-v1.0.0"
+  ami_name              = join("-",[local.ami_name,var.version])
   force_delete_snapshot = true
   instance_type         = "${local.instance_type}"
   region                = "${var.region}"
