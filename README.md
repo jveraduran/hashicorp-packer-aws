@@ -1,4 +1,4 @@
-<p align="center" style="text-align:center;">
+<p align="center" style="text-align:left;">
   <a href="https://www.packer.io">
     <img alt="HashiCorp Packer logo" src="img/logo-packer-padded.svg" width="500" />
   </a>
@@ -187,7 +187,7 @@ us-east-1: ami-07a223a4bdb6d88cb
 
 After this successfully output, you can check on your AWS Console your Custom AMI on **EC2 > Images > AMI**
 
-<p align="center" style="text-align:center;">
+<p align="center" style="text-align:left;">
   <a href="https://www.packer.io">
     <img alt="AMI AWS" src="img/ami.png" width="500" />
   </a>
@@ -216,7 +216,7 @@ jobs:
  After that, we need to define our variables on [Github Secrets](https://docs.github.com/es/rest/actions/secrets)
 
 
-<p align="center" style="text-align:center;">
+<p align="center" style="text-align:left;">
   <a href="https://www.packer.io">
     <img alt="GitHub Action Secrets" src="img/action-secrets.png" width="500" />
   </a>
@@ -247,13 +247,13 @@ Our environment Value ```ÀPP_ENV``` will come from the GithubAction Pipeline, d
 
 After the creation of a new branch ```git checkout -b feat/new-branch``` and the push a pull request, you'll see this on your **Github Action**
 
-<p align="center" style="text-align:center;">
+<p align="center" style="text-align:left;">
   <a href="https://www.packer.io">
     <img alt="GitHub Action PR" src="img/action-workflow-pr.png" width="500" />
   </a>
 </p>
 
-<p align="center" style="text-align:center;">
+<p align="center" style="text-align:left;">
   <a href="https://www.packer.io">
     <img alt="GitHub Action PR" src="img/action-workflow-pr-validate.png" width="500" />
   </a>
@@ -261,13 +261,13 @@ After the creation of a new branch ```git checkout -b feat/new-branch``` and the
 
 After the merge, you'll see  this on your **Github Action**
 
-<p align="center" style="text-align:center;">
+<p align="center" style="text-align:left;">
   <a href="https://www.packer.io">
     <img alt="GitHub Action PR" src="img/action-workflow-merge.png" width="500" />
   </a>
 </p>
 
-<p align="center" style="text-align:center;">
+<p align="center" style="text-align:left;">
   <a href="https://www.packer.io">
     <img alt="GitHub Action PR" src="img/action-workflow-merge-build.png" width="500" />
   </a>
@@ -275,7 +275,7 @@ After the merge, you'll see  this on your **Github Action**
 
 After this successfully output, you can check on your AWS Console your Custom AMI on **EC2 > Images > AMI**
 
-<p align="center" style="text-align:center;">
+<p align="center" style="text-align:left;">
   <a href="https://www.packer.io">
     <img alt="AMI AWS" src="img/ami.png" width="500" />
   </a>
