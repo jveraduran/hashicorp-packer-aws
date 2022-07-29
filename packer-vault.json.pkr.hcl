@@ -49,12 +49,17 @@ variable "vault_token" {
   type    = string
   default = env("VAULT_TOKEN")
 }
-# https://www.packer.io/docs/templates/hcl_templates/functions/contextual/consul
+
+variable "vault_namespace" {
+  type    = string
+  default = env("VAULT_NAMESPACE")
+}
+# https://www.packer.io/docs/templates/hcl_templates/functions/contextual/vault
 locals {
-  ami_name      = consul_key(join("/",["polymathes/temporal",var.app_env,"packer/ami-name"]))
-  ssh_username  = consul_key("polymathes/temporal/packer/ssh-username")
-  source_ami    = consul_key("polymathes/temporal/packer/source-ami")
-  instance_type = consul_key("polymathes/temporal/packer/instance-type")
+  ami_name      = vault(join("/",["kv/polymathes/temporal",var.app_env,"packer"]),"ami-name")
+  ssh_username  = vault(join("/",["kv/polymathes/temporal",var.app_env,"packer"]),"ssh-username")
+  source_ami    = vault(join("/",["kv/polymathes/temporal",var.app_env,"packer"]),"source-ami")
+  instance_type = vault(join("/",["kv/polymathes/temporal",var.app_env,"packer"]),"instance-type")
 }
 
 # source blocks are generated from your builders; a source can be referenced in

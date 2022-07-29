@@ -1,4 +1,4 @@
-name: Packer
+name: Packer Consul
 
 on:
   push:

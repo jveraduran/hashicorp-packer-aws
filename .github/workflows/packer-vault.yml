@@ -1,0 +1,74 @@
+name: Packer Vault
+
+on:
+  push:
+    branches: [develop, staging, master]
+  pull_request: 
+    branches: [develop, staging, master]
+    types: [opened, synchronize]
+  workflow_call:
+
+jobs:
+  Validate:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    name: Validate
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Validate Template
+        uses: hashicorp/packer-github-actions@master
+        with:
+          command: validate
+          arguments: -syntax-only
+          target: packer-vault.json.pkr.hcl
+
+  Init:
+    needs: [Validate]
+    if: ${{ (github.event_name == 'push') && always() }}
+    runs-on: ubuntu-latest
+    name: Init
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+      
+      - name: Setup ENV
+        shell: bash
+        run: |-
+          if [ ${{ github.event_name }} == "pull_request" ]; then 
+            branch=$(echo ${{ github.base_ref }}  | tr / -)
+          else 
+            branch=$(echo ${GITHUB_REF#refs/heads/} | tr / -)
+          fi
+          if [ $branch = "master" ]; then 
+            env="production";
+          elif [ $branch = "develop" ]; then 
+            env="develop";
+          elif [ $branch = "staging" ]; then 
+            env="staging";
+          else 
+            echo "invalid environment"; exit -1
+          fi
+          echo "ENV=$(echo $env)" >> $GITHUB_ENV
+      
+      - name: Download Packer Plugin
+        uses: hashicorp/packer-github-actions@master
+        with:
+          command: init
+          target: packer-vault.json.pkr.hcl
+
+      - name: Build Artifact
+        uses: hashicorp/packer-github-actions@master
+        with:
+          command: build
+          arguments: "-color=false -on-error=abort -force -var version=${{ github.run_number }}"
+          target: packer-vault.json.pkr.hcl
+        env:
+          AWS_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY }}
+          AWS_SECRET_KEY: ${{ secrets.AWS_SECRET_KEY }}
+          AWS_REGION: "us-east-1"
+          VAULT_ADDR: ${{ secrets.VAULT_ADDR }}
+          VAULT_TOKEN: ${{ secrets.VAULT_TOKEN }}
+          VAULT_NAMESPACE: ${{ secrets.VAULT_NAMESPACE }}
+          APP_ENV: ${{ env.ENV }}
