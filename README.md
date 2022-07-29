@@ -281,6 +281,12 @@ After this successfully output, you can check on your AWS Console your Custom AM
   </a>
 </p>
 
+### Resume
+
+**Github Actions** it's a powerful and complete **Continuous Integration** tool, that enable a lot of capabilities to any kind of developers.
+
+**Packer** it's an amazing tool, to manage your machine images for multiples platform, that you can manage locally or in your **Github Actions Pipelines**.
+
 ### Contributing
 
 I'm grateful to the community for contributing bugfixes and improvements!
