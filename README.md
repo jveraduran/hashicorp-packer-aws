@@ -245,5 +245,42 @@ Our environment Value ```ÀPP_ENV``` will come from the GithubAction Pipeline, d
           echo "ENV=$(echo $env)" >> $GITHUB_ENV
 ```
 
-After the creation of a new branch ```git checkout -b feat/new-branch``` and the push a pull request, you will see this on the **Github Action**
+After the creation of a new branch ```git checkout -b feat/new-branch``` and the push a pull request, you'll see this on your **Github Action**
 
+<p align="center" style="text-align:center;">
+  <a href="https://www.packer.io">
+    <img alt="GitHub Action PR" src="img/action-workflow-pr.png" width="500" />
+  </a>
+</p>
+
+<p align="center" style="text-align:center;">
+  <a href="https://www.packer.io">
+    <img alt="GitHub Action PR" src="img/action-workflow-pr-validate.png" width="500" />
+  </a>
+</p>
+
+After the merge, you'll see  this on your **Github Action**
+
+<p align="center" style="text-align:center;">
+  <a href="https://www.packer.io">
+    <img alt="GitHub Action PR" src="img/action-workflow-merge.png" width="500" />
+  </a>
+</p>
+
+<p align="center" style="text-align:center;">
+  <a href="https://www.packer.io">
+    <img alt="GitHub Action PR" src="img/action-workflow-merge-build.png" width="500" />
+  </a>
+</p>
+
+After this successfully output, you can check on your AWS Console your Custom AMI on **EC2 > Images > AMI**
+
+<p align="center" style="text-align:center;">
+  <a href="https://www.packer.io">
+    <img alt="AMI AWS" src="img/ami.png" width="500" />
+  </a>
+</p>
+
+### Contributing
+
+I'm grateful to the community for contributing bugfixes and improvements!
