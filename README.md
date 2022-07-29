@@ -17,111 +17,233 @@ Support for other platforms can be added via plugins.
 The images that Packer creates can easily be turned into
 [Vagrant](http://www.vagrantup.com) boxes.
 
-## Quick Start
+## About this implementation
 
-**Note:** There is a great
-[introduction and getting started guide](https://learn.hashicorp.com/tutorials/packer/get-started-install-cli)
-for those with a bit more patience. Otherwise, the quick start below
-will get you up and running quickly, at the sacrifice of not explaining some
-key points.
+This repository, has the implementation of **Hashicorp Packer** with **GitHub Actions**, you can read more about this on official web page https://www.packer.io and https://github.com/features/actions
 
-First, [download a pre-built Packer
-binary](https://www.packer.io/downloads.html) for your operating system or
-[compile Packer
-yourself](https://github.com/hashicorp/packer/blob/master/.github/CONTRIBUTING.md#setting-up-go-to-work-on-packer).
+## Building Options
 
-After Packer is installed, create your first template, which tells Packer
-what platforms to build images for and how you want to build them. In our
-case, we'll create a simple AMI that has Redis pre-installed.
+To execute this locally, you need to install Packer o your environment, you can find the official documentation [here](https://learn.hashicorp.com/tutorials/packer/get-started-install-cli)
 
-Save this file as `quick-start.pkr.hcl`. Export your AWS credentials as the
-`AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` environment variables.
+After installation proccess, you are available to execute locally with this initial commando to validate your packer file, on my case i use Packer with HCL2 (More information about this implementation [here](https://www.packer.io/guides/hcl))
 
-```hcl
-variable "access_key" {
+We'll use this HCL2 file to start up with our demo, with [Shell Provisioner](https://www.packer.io/docs/provisioners/shell) and [File Provisioner](https://www.packer.io/docs/provisioners/file)
+
+```
+variable "aws_access_key" {
   type    = string
-  default = "${env("AWS_ACCESS_KEY_ID")}"
+  default = "${env("AWS_ACCESS_KEY")}"
 }
 
-variable "secret_key" {
-  type      = string
-  default   = "${env("AWS_SECRET_ACCESS_KEY")}"
-  sensitive = true
+variable "aws_secret_key" {
+  type    = string
+  default = "${env("AWS_SECRET_KEY")}"
 }
 
-locals { timestamp = regex_replace(timestamp(), "[- TZ:]", "") }
+variable "region" {
+  type    = string
+  default = "${env("AWS_REGION")}"
+}
 
-source "amazon-ebs" "quick-start" {
-  access_key    = "${var.access_key}"
-  ami_name      = "packer-example ${local.timestamp}"
-  instance_type = "t2.micro"
-  region        = "us-east-1"
-  secret_key    = "${var.secret_key}"
-  source_ami    = "ami-af22d9b9"
-  ssh_username  = "ubuntu"
+variable "app_env" {
+  type    = string
+  default = "${env("APP_ENV")}"
+}
+
+variable "version" {
+  type    = string
+  default = "${env("VERSION")}"
+}
+
+variable "consul_http_addr" {
+  type    = string
+  default = "${env("CONSUL_HTTP_ADDR")}"
+}
+
+variable "consul_http_token" {
+  type    = string
+  default = "${env("CONSUL_HTTP_TOKEN")}"
+}
+
+locals {
+  ami_name      = "${consul_key(join("/",["polymathes/temporal",var.app_env,"packer/ami-name"]))}"
+  ssh_username  = "${consul_key("polymathes/temporal/packer/ssh-username")}"
+  source_ami    = "${consul_key("polymathes/temporal/packer/source-ami")}"
+  instance_type = "${consul_key("polymathes/temporal/packer/instance-type")}"
+}
+
+source "amazon-ebs" "ami" {
+  access_key            = "${var.aws_access_key}"
+  ami_name              = join("-",[local.ami_name,var.version])
+  force_delete_snapshot = true
+  instance_type         = "${local.instance_type}"
+  region                = "${var.region}"
+  secret_key            = "${var.aws_secret_key}"
+  source_ami            = "${local.source_ami}"
+  ssh_username          = "${local.ssh_username}"
+  tags = {
+    Name        = "${local.ami_name}"
+    Environment = "${var.app_env}"
+  }
 }
 
 build {
-  sources = ["source.amazon-ebs.quick-start"]
-}
-```
+  sources = ["source.amazon-ebs.ami"]
 
-Next, tell Packer to build the image:
+  provisioner "shell" {
+    inline = ["mkdir ~/ssh-conf"]
+  }
 
-```
-$ packer build quick-start.pkr.hcl
-...
-```
-
-Packer will build an AMI according to the "quick-start" template. The AMI
-will be available in your AWS account. To delete the AMI, you must manually
-delete it using the [AWS console](https://console.aws.amazon.com/). Packer
-builds your images, it does not manage their lifecycle. Where they go, how
-they're run, etc., is up to you.
-
-# Packer Plugin Amazon
-The `Amazon` multi-component plugin can be used with HashiCorp [Packer](https://www.packer.io)
-to create custom images. For the full list of available features for this plugin see [docs](docs).
-
-## Installation
-
-### Using pre-built releases
-
-#### Using the `packer init` command
-
-Starting from version 1.7, Packer supports a new `packer init` command allowing
-automatic installation of Packer plugins. Read the
-[Packer documentation](https://www.packer.io/docs/commands/init) for more information.
-
-To install this plugin, copy and paste this code into your Packer configuration .
-Then, run [`packer init`](https://www.packer.io/docs/commands/init).
-
-```hcl
-packer {
-  required_plugins {
-    amazon = {
-      version = ">= 1.1.1"
-      source  = "github.com/hashicorp/amazon"
-    }
+  provisioner "file" {
+    source      = "./ssh/ssh_config"
+    destination = "~/ssh-conf/ssh_config"
   }
 }
+
 ```
 
+We'll start validating our **Packer Files**
 
-#### Manual installation
+```
+packer validate -syntax-only packer.json.pkr.hcl
+```
 
-You can find pre-built binary releases of the plugin [here](https://github.com/hashicorp/packer-plugin-amazon/releases).
-Once you have downloaded the latest archive corresponding to your target OS,
-uncompress it to retrieve the plugin binary file corresponding to your platform.
-To install the plugin, please follow the Packer documentation on
-[installing a plugin](https://www.packer.io/docs/extending/plugins/#installing-plugins).
+Our output, if everything was fine will be
+
+```
+Syntax-only check passed. Everything looks okay.
+```
+
+To execute completly this locally, you must setting up the environment variables need to execute this properly
+
+```
+export AWS_ACCESS_KEY=
+export AWS_SECRET_KEY=
+export AWS_REGION=
+export CONSUL_HTTP_ADDR=
+export CONSUL_HTTP_TOKEN=
+export APP_ENV=
+```
+
+| Name | Description | Required |
+|------|--------|---------|
+|AWS_ACCESS_KEY|**AWS ACCESS KEY** generated with IAM on AWS Console | yes |
+|AWS_SECRET_KEY|**AWS SECRET KEY** generated with IAM on AWS Console | yes |
+|AWS_REGION|**REGION** used for the AMI | yes |
+|CONSUL_HTTP_ADDR|**CONSUL_HTTP_ADDR** used for store KV and **Packer consul_key function**, more information [here](https://www.consul.io/commands#environment-variables) | yes |
+|CONSUL_HTTP_TOKEN|**CONSUL_HTTP_TOKEN** used for store KV and **Packer consul_key function**, more information [here](https://www.consul.io/commands#environment-variables) | yes |
+
+For more information about Packer consul_key function, please [here](https://www.packer.io/docs/templates/hcl_templates/functions/contextual/consul)
+
+After this variable definition, we can execute the command ``packer build`` (more information about this [here](https://www.packer.io/docs/commands/build)), we'll use for this example this extra arguments ```-color=false -on-error=abort -force```
+
+```
+packer build -color=false -on-error=abort -force packer.json.pkr.hcl
+```
+
+The expected output, will be like this
+
+```
+==> amazon-ebs.ami: Force Deregister flag found, skipping prevalidating AMI Name
+    amazon-ebs.ami: Found Image ID: ami-07ebfd5b3428b6f4d
+==> amazon-ebs.ami: Creating temporary keypair: packer_62e3f838-a111-ea42-28c6-b7e0a10f4d00
+==> amazon-ebs.ami: Creating temporary security group for this instance: packer_62e3f849-7af3-42d5-5533-0dca0f6a174c
+==> amazon-ebs.ami: Authorizing access to port 22 from [0.0.0.0/0] in the temporary security groups...
+==> amazon-ebs.ami: Launching a source AWS instance...
+    amazon-ebs.ami: Instance ID: i-05effdcbda4b9dca4
+==> amazon-ebs.ami: Waiting for instance (i-05effdcbda4b9dca4) to become ready...
+==> amazon-ebs.ami: Using SSH communicator to connect: 44.204.218.161
+==> amazon-ebs.ami: Waiting for SSH to become available...
+==> amazon-ebs.ami: Connected to SSH!
+==> amazon-ebs.ami: Provisioning with shell script: /var/folders/ld/q8ckg5_96f1c7xj6mpxwqjs40000gp/T/packer-shell2006054652
+==> amazon-ebs.ami: Uploading ./ssh/ssh_config => ~/ssh-conf/ssh_config
+    amazon-ebs.ami: ssh_config 1.59 KiB / 1.59 KiB [=======================================================] 100.00% 0s
+==> amazon-ebs.ami: Stopping the source instance...
+    amazon-ebs.ami: Stopping instance
+==> amazon-ebs.ami: Waiting for the instance to stop...
+==> amazon-ebs.ami: Creating AMI Packer- from instance i-05effdcbda4b9dca4
+    amazon-ebs.ami: AMI: ami-07a223a4bdb6d88cb
+==> amazon-ebs.ami: Waiting for AMI to become ready...
+==> amazon-ebs.ami: Skipping Enable AMI deprecation...
+==> amazon-ebs.ami: Adding tags to AMI (ami-07a223a4bdb6d88cb)...
+==> amazon-ebs.ami: Tagging snapshot: snap-0acce3966eea1b81f
+==> amazon-ebs.ami: Creating AMI tags
+    amazon-ebs.ami: Adding tag: "Environment": ""
+    amazon-ebs.ami: Adding tag: "Name": "Packer"
+==> amazon-ebs.ami: Creating snapshot tags
+==> amazon-ebs.ami: Terminating the source AWS instance...
+==> amazon-ebs.ami: Cleaning up any extra volumes...
+==> amazon-ebs.ami: No volumes to clean up, skipping
+==> amazon-ebs.ami: Deleting temporary security group...
+==> amazon-ebs.ami: Deleting temporary keypair...
+Build 'amazon-ebs.ami' finished after 4 minutes 58 seconds.
+
+==> Wait completed after 4 minutes 58 seconds
+
+==> Builds finished. The artifacts of successful builds are:
+--> amazon-ebs.ami: AMIs were created:
+us-east-1: ami-07a223a4bdb6d88cb
+```
+
+After this successfully output, you can check on your AWS Console your Custom AMI on **EC2 > Images > AMI**
+
+<p align="center" style="text-align:center;">
+  <a href="https://www.packer.io">
+    <img alt="AMI AWS" src="img/ami.png" width="500" />
+  </a>
+</p>
 
 
-### From Sources
+To do the same in an apropiate Continous Integration process, we choose **GitHub Actions**, so we define that packer validate just execute on **Pull Request** proccess. To enable this option, we describe our action in the next way, defining a expression ```github.event_name == 'pull_request'```(More information about this option [here](https://docs.github.com/en/actions/learn-github-actions/expressions))
 
-If you prefer to build the plugin from sources, clone the GitHub repository
-locally and run the command `go build` from the root
-directory. Upon successful compilation, a `packer-plugin-amazon` plugin
-binary file can be found in the root directory.
-To install the compiled plugin, please follow the official Packer documentation
-on [installing a plugin](https://www.packer.io/docs/extending/plugins/#installing-plugins).
+```
+jobs:
+  Validate:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    name: Validate
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Validate Template
+        uses: hashicorp/packer-github-actions@master
+        with:
+          command: validate
+          arguments: -syntax-only
+          target: packer.json.pkr.hcl
+```
+ After that, we need to define our variables on [Github Secrets](https://docs.github.com/es/rest/actions/secrets)
+
+
+<p align="center" style="text-align:center;">
+  <a href="https://www.packer.io">
+    <img alt="GitHub Action Secrets" src="img/action-secrets.png" width="500" />
+  </a>
+</p>
+
+Our environment Value ```ÀPP_ENV``` will come from the GithubAction Pipeline, definden by the **branch**
+
+```
+- name: Setup ENV
+        shell: bash
+        run: |-
+          if [ ${{ github.event_name }} == "pull_request" ]; then 
+            branch=$(echo ${{ github.base_ref }}  | tr / -)
+          else 
+            branch=$(echo ${GITHUB_REF#refs/heads/} | tr / -)
+          fi
+          if [ $branch = "master" ]; then 
+            env="production";
+          elif [ $branch = "develop" ]; then 
+            env="develop";
+          elif [ $branch = "staging" ]; then 
+            env="staging";
+          else 
+            echo "invalid environment"; exit -1
+          fi
+          echo "ENV=$(echo $env)" >> $GITHUB_ENV
+```
+
+After the creation of a new branch ```git checkout -b feat/new-branch``` and the push a pull request, you will see this on the **Github Action**
+
