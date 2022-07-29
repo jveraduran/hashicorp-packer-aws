@@ -1,3 +1,4 @@
+# Packer with Github Actions
 <p align="left" style="text-align:left;">
   <a href="https://www.packer.io">
     <img alt="HashiCorp Packer logo" src="img/logo-packer-padded.svg" width="500" />
@@ -17,11 +18,11 @@ Support for other platforms can be added via plugins.
 The images that Packer creates can easily be turned into
 [Vagrant](http://www.vagrantup.com) boxes.
 
-## About this implementation
+# About this implementation
 
 This repository, has the implementation of **Hashicorp Packer** with **GitHub Actions**, you can read more about this on official web page https://www.packer.io and https://github.com/features/actions
 
-## Building Options
+# Building Options
 
 To execute this locally, you need to install Packer o your environment, you can find the official documentation [here](https://learn.hashicorp.com/tutorials/packer/get-started-install-cli)
 
@@ -281,6 +282,12 @@ After this successfully output, you can check on your AWS Console your Custom AM
   </a>
 </p>
 
-### Contributing
+# Resume
+
+**Github Actions** it's a powerful and complete **Continuous Integration** tool, that enable a lot of capabilities to any kind of developers.
+
+**Packer** it's an amazing tool, to manage your machine images for multiples platform, that you can manage locally or in your **Github Actions Pipelines**.
+
+# Contributing
 
 I'm grateful to the community for contributing bugfixes and improvements!
