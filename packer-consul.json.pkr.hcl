@@ -17,44 +17,44 @@
 # https://www.packer.io/docs/templates/hcl_templates/variables#type-constraints for more info.
 variable "aws_access_key" {
   type    = string
-  default = "${env("AWS_ACCESS_KEY")}"
+  default = env("AWS_ACCESS_KEY")
 }
 
 variable "aws_secret_key" {
   type    = string
-  default = "${env("AWS_SECRET_KEY")}"
+  default = env("AWS_SECRET_KEY")
 }
 
 variable "region" {
   type    = string
-  default = "${env("AWS_REGION")}"
+  default = env("AWS_REGION")
 }
 
 variable "app_env" {
   type    = string
-  default = "${env("APP_ENV")}"
+  default = env("APP_ENV")
 }
 
 variable "version" {
   type    = string
-  default = "${env("VERSION")}"
+  default = env("VERSION")
 }
 
 variable "consul_http_addr" {
   type    = string
-  default = "${env("CONSUL_HTTP_ADDR")}"
+  default = env("CONSUL_HTTP_ADDR")
 }
 
 variable "consul_http_token" {
   type    = string
-  default = "${env("CONSUL_HTTP_TOKEN")}"
+  default = env("CONSUL_HTTP_TOKEN")
 }
 # https://www.packer.io/docs/templates/hcl_templates/functions/contextual/consul
 locals {
-  ami_name      = "${consul_key(join("/",["polymathes/temporal",var.app_env,"packer/ami-name"]))}"
-  ssh_username  = "${consul_key("polymathes/temporal/packer/ssh-username")}"
-  source_ami    = "${consul_key("polymathes/temporal/packer/source-ami")}"
-  instance_type = "${consul_key("polymathes/temporal/packer/instance-type")}"
+  ami_name      = consul_key(join("/",["polymathes/temporal",var.app_env,"packer/ami-name"]))
+  ssh_username  = consul_key("polymathes/temporal/packer/ssh-username")
+  source_ami    = consul_key("polymathes/temporal/packer/source-ami")
+  instance_type = consul_key("polymathes/temporal/packer/instance-type")
 }
 
 # source blocks are generated from your builders; a source can be referenced in
@@ -63,17 +63,17 @@ locals {
 # https://www.packer.io/docs/templates/hcl_templates/blocks/source
 # https://www.packer.io/plugins/builders/amazon/ebs
 source "amazon-ebs" "ami" {
-  access_key            = "${var.aws_access_key}"
+  access_key            = var.aws_access_key
   ami_name              = join("-",[local.ami_name,var.version])
   force_delete_snapshot = true
-  instance_type         = "${local.instance_type}"
-  region                = "${var.region}"
-  secret_key            = "${var.aws_secret_key}"
-  source_ami            = "${local.source_ami}"
-  ssh_username          = "${local.ssh_username}"
+  instance_type         = local.instance_type
+  region                = var.region
+  secret_key            = var.aws_secret_key
+  source_ami            = local.source_ami
+  ssh_username          = local.ssh_username
   tags = {
-    Name        = "${local.ami_name}"
-    Environment = "${var.app_env}"
+    Name        = local.ami_name
+    Environment = var.app_env
   }
 }
 

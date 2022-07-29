@@ -22,7 +22,7 @@ jobs:
         with:
           command: validate
           arguments: -syntax-only
-          target: packer.json.pkr.hcl
+          target: packer-consul.json.pkr.hcl
 
   Init:
     needs: [Validate]
@@ -62,6 +62,7 @@ jobs:
         with:
           command: build
           arguments: "-color=false -on-error=abort -force -var version=${{ github.run_number }}"
+          target: packer-consul.json.pkr.hcl
         env:
           AWS_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY }}
           AWS_SECRET_KEY: ${{ secrets.AWS_SECRET_KEY }}

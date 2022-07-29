@@ -106,7 +106,7 @@ build {
 We'll start validating our **Packer Files**
 
 ```
-packer validate -syntax-only packer.json.pkr.hcl
+packer validate -syntax-only packer-consul.json.pkr.hcl
 ```
 
 Our output, if everything was fine will be
@@ -139,7 +139,7 @@ For more information about Packer consul_key function, please [here](https://www
 After this variable definition, we can execute the command ``packer build`` (more information about this [here](https://www.packer.io/docs/commands/build)), we'll use for this example this extra arguments ```-color=false -on-error=abort -force```
 
 ```
-packer build -color=false -on-error=abort -force packer.json.pkr.hcl
+packer build -color=false -on-error=abort -force packer-consul.json.pkr.hcl
 ```
 
 The expected output, will be like this
@@ -212,7 +212,7 @@ jobs:
         with:
           command: validate
           arguments: -syntax-only
-          target: packer.json.pkr.hcl
+          target: packer-consul.json.pkr.hcl
 ```
  After that, we need to define our variables on [Github Secrets](https://docs.github.com/es/rest/actions/secrets)
 
