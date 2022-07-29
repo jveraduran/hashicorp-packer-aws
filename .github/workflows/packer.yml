@@ -56,6 +56,7 @@ jobs:
         uses: hashicorp/packer-github-actions@master
         with:
           command: init
+          target: packer-consul.json.pkr.hcl
 
       - name: Build Artifact
         uses: hashicorp/packer-github-actions@master
