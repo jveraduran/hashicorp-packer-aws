@@ -18,7 +18,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Validate Template
-        uses: hashicorp/packer-github-actions@master
+        uses: jveraduran/packer-github-actions@master
         with:
           command: validate
           arguments: -syntax-only
@@ -53,13 +53,13 @@ jobs:
           echo "ENV=$(echo $env)" >> $GITHUB_ENV
       
       - name: Download Packer Plugin
-        uses: hashicorp/packer-github-actions@master
+        uses: jveraduran/packer-github-actions@master
         with:
           command: init
           target: packer-consul.json.pkr.hcl
 
       - name: Build Artifact
-        uses: hashicorp/packer-github-actions@master
+        uses: jveraduran/packer-github-actions@master
         with:
           command: build
           arguments: "-color=false -on-error=abort -force -var version=${{ github.run_number }}"
