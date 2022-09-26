@@ -51,7 +51,7 @@ variable "consul_http_token" {
 }
 # https://www.packer.io/docs/templates/hcl_templates/functions/contextual/consul
 locals {
-  ami_name      = consul_key(join("/",["polymathes/temporal",var.app_env,"packer/ami-name"]))
+  ami_name      = consul_key(join("/", ["polymathes/temporal", var.app_env, "packer/ami-name"]))
   ssh_username  = consul_key("polymathes/temporal/packer/ssh-username")
   source_ami    = consul_key("polymathes/temporal/packer/source-ami")
   instance_type = consul_key("polymathes/temporal/packer/instance-type")
@@ -64,7 +64,7 @@ locals {
 # https://www.packer.io/plugins/builders/amazon/ebs
 source "amazon-ebs" "ami" {
   access_key            = var.aws_access_key
-  ami_name              = join("-",[local.ami_name,var.version])
+  ami_name              = join("-", [local.ami_name, var.version])
   force_delete_snapshot = true
   instance_type         = local.instance_type
   region                = var.region
@@ -83,21 +83,21 @@ source "amazon-ebs" "ami" {
 build {
   sources = ["source.amazon-ebs.ami"]
 
-# details about provisioner in the documentation
-# https://www.packer.io/docs/provisioners/shell
+  # details about provisioner in the documentation
+  # https://www.packer.io/docs/provisioners/shell
   provisioner "shell" {
     inline = ["mkdir ~/ssh-conf"]
   }
 
-# details about provisioner in the documentation
-# https://www.packer.io/plugins/provisioners/ansible/ansible
+  # details about provisioner in the documentation
+  # https://www.packer.io/plugins/provisioners/ansible/ansible
   provisioner "ansible" {
     playbook_file = "./ansible/k8s.yaml"
     user          = "ubuntu"
   }
 
-# details about provisioner in the documentation
-# https://www.packer.io/docs/provisioners/file
+  # details about provisioner in the documentation
+  # https://www.packer.io/docs/provisioners/file
   provisioner "file" {
     source      = "./ssh/ssh_config"
     destination = "~/ssh-conf/ssh_config"
